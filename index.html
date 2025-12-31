@@ -18,34 +18,50 @@
                 <form id="calculatorForm">
                     <div class="input-group">
                         <label for="pressure">
-                            Pressure (psi)
-                            <span class="info-icon" title="Enter pressure in pounds per square inch">ⓘ</span>
+                            Pressure
+                            <span class="info-icon" title="Enter pressure value">ⓘ</span>
                         </label>
-                        <input 
-                            type="number" 
-                            id="pressure" 
-                            name="pressure" 
-                            step="0.01" 
-                            min="0.01"
-                            placeholder="e.g., 230"
-                            required
-                        >
+                        <div class="input-with-unit">
+                            <input 
+                                type="number" 
+                                id="pressure" 
+                                name="pressure" 
+                                step="0.01" 
+                                min="0.01"
+                                placeholder="e.g., 230"
+                                required
+                            >
+                            <select id="pressureUnit" class="unit-select">
+                                <option value="psi">psi</option>
+                                <option value="bar">bar</option>
+                                <option value="kPa">kPa</option>
+                                <option value="MPa">MPa</option>
+                                <option value="atm">atm</option>
+                            </select>
+                        </div>
                     </div>
 
                     <div class="input-group">
                         <label for="temperature">
-                            Temperature (°C)
-                            <span class="info-icon" title="Enter temperature in degrees Celsius">ⓘ</span>
+                            Temperature
+                            <span class="info-icon" title="Enter temperature value">ⓘ</span>
                         </label>
-                        <input 
-                            type="number" 
-                            id="temperature" 
-                            name="temperature" 
-                            step="0.01" 
-                            min="-273.15"
-                            placeholder="e.g., 30"
-                            required
-                        >
+                        <div class="input-with-unit">
+                            <input 
+                                type="number" 
+                                id="temperature" 
+                                name="temperature" 
+                                step="0.1"
+                                placeholder="e.g., 30"
+                                required
+                            >
+                            <select id="temperatureUnit" class="unit-select">
+                                <option value="C">°C</option>
+                                <option value="F">°F</option>
+                                <option value="K">K</option>
+                                <option value="R">°R</option>
+                            </select>
+                        </div>
                     </div>
 
                     <div class="checkbox-group">
@@ -53,6 +69,20 @@
                             <input type="checkbox" id="showDetails" name="showDetails">
                             Show detailed calculations
                         </label>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="outputUnit">
+                            Output Gradient Units
+                            <span class="info-icon" title="Select gradient output units">ⓘ</span>
+                        </label>
+                        <select id="outputUnit" class="unit-select-full">
+                            <option value="psi/ft">psi/ft</option>
+                            <option value="kPa/m">kPa/m</option>
+                            <option value="bar/m">bar/m</option>
+                            <option value="psi/m">psi/m</option>
+                            <option value="MPa/m">MPa/m</option>
+                        </select>
                     </div>
 
                     <button type="submit" class="calculate-btn">Calculate Gradient</button>
@@ -63,7 +93,7 @@
                     <div class="result-main">
                         <span class="result-label">Gas Gradient:</span>
                         <span id="gradientValue" class="result-value">-</span>
-                        <span class="result-unit">psi/ft</span>
+                        <span id="gradientUnit" class="result-unit">psi/ft</span>
                     </div>
 
                     <div id="detailedResults" class="detailed-results hidden">

@@ -99,8 +99,13 @@ main {
     font-size: 0.9rem;
 }
 
+.input-with-unit {
+    display: flex;
+    gap: 0.5rem;
+}
+
 .input-group input[type="number"] {
-    width: 100%;
+    flex: 1;
     padding: 0.75rem 1rem;
     border: 2px solid var(--border-color);
     border-radius: 8px;
@@ -110,6 +115,40 @@ main {
 }
 
 .input-group input[type="number"]:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.unit-select {
+    padding: 0.75rem;
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 1rem;
+    background: white;
+    cursor: pointer;
+    transition: all 0.2s;
+    min-width: 80px;
+}
+
+.unit-select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.unit-select-full {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 1rem;
+    background: white;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.unit-select-full:focus {
     outline: none;
     border-color: var(--primary-color);
     box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);

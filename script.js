@@ -11,6 +11,31 @@ const CONSTANTS = {
     T_CRITICAL_C: -82.6 // Critical temperature in Celsius
 };
 
+// Unit conversion factors
+const UNIT_CONVERSIONS = {
+    pressure: {
+        psi: 1,
+        bar: 14.5038,
+        kPa: 0.145038,
+        MPa: 145.038,
+        atm: 14.6959
+    },
+    temperature: {
+        // All convert to Celsius first
+        C: (val) => val,
+        F: (val) => (val - 32) * 5/9,
+        K: (val) => val - 273.15,
+        R: (val) => (val - 491.67) * 5/9
+    },
+    gradient: {
+        'psi/ft': 1,
+        'kPa/m': 0.0226254, // 1 psi/ft = 0.0226254 kPa/m
+        'bar/m': 0.0002262,  // 1 psi/ft = 0.0002262 bar/m
+        'psi/m': 3.28084,    // 1 psi/ft = 3.28084 psi/m
+        'MPa/m': 0.00002262  // 1 psi/ft = 0.00002262 MPa/m
+    }
+};
+
 /**
  * Calculate compressibility factor (Z) for methane
  * @param {number} pressurePsi - Pressure in PSI
@@ -73,6 +98,36 @@ function calculateGasGradient(pressurePsi, tempCelsius) {
 }
 
 /**
+ * Convert pressure to PSI
+ * @param {number} value - Pressure value
+ * @param {string} unit - Source unit
+ * @returns {number} Pressure in PSI
+ */
+function convertPressureToPsi(value, unit) {
+    return value * UNIT_CONVERSIONS.pressure[unit];
+}
+
+/**
+ * Convert temperature to Celsius
+ * @param {number} value - Temperature value
+ * @param {string} unit - Source unit
+ * @returns {number} Temperature in Celsius
+ */
+function convertTemperatureToCelsius(value, unit) {
+    return UNIT_CONVERSIONS.temperature[unit](value);
+}
+
+/**
+ * Convert gradient from psi/ft to target unit
+ * @param {number} gradientPsiFt - Gradient in psi/ft
+ * @param {string} targetUnit - Target unit
+ * @returns {number} Gradient in target unit
+ */
+function convertGradient(gradientPsiFt, targetUnit) {
+    return gradientPsiFt / UNIT_CONVERSIONS.gradient[targetUnit];
+}
+
+/**
  * Format number to fixed decimal places
  * @param {number} num - Number to format
  * @param {number} decimals - Number of decimal places
@@ -86,17 +141,23 @@ function formatNumber(num, decimals = 6) {
  * Display results in the UI
  * @param {Object} results - Results object from calculation
  * @param {boolean} showDetails - Whether to show detailed calculations
+ * @param {string} outputUnit - Output unit for gradient
  */
-function displayResults(results, showDetails) {
+function displayResults(results, showDetails, outputUnit) {
     const resultsDiv = document.getElementById('results');
     const detailedResultsDiv = document.getElementById('detailedResults');
     const gradientValue = document.getElementById('gradientValue');
+    const gradientUnit = document.getElementById('gradientUnit');
     
     // Show results section
     resultsDiv.classList.remove('hidden');
     
+    // Convert gradient to selected output unit
+    const convertedGradient = convertGradient(results.gradient, outputUnit);
+    
     // Display main gradient result
-    gradientValue.textContent = formatNumber(results.gradient, 6);
+    gradientValue.textContent = formatNumber(convertedGradient, 6);
+    gradientUnit.textContent = outputUnit;
     
     // Display detailed results if checkbox is checked
     if (showDetails) {
@@ -168,21 +229,28 @@ function handleFormSubmit(event) {
     // Get form values
     const pressure = parseFloat(document.getElementById('pressure').value);
     const temperature = parseFloat(document.getElementById('temperature').value);
+    const pressureUnit = document.getElementById('pressureUnit').value;
+    const temperatureUnit = document.getElementById('temperatureUnit').value;
+    const outputUnit = document.getElementById('outputUnit').value;
     const showDetails = document.getElementById('showDetails').checked;
     
-    // Validate inputs
-    const validation = validateInputs(pressure, temperature);
+    // Convert inputs to standard units (PSI and Celsius)
+    const pressurePsi = convertPressureToPsi(pressure, pressureUnit);
+    const temperatureCelsius = convertTemperatureToCelsius(temperature, temperatureUnit);
+    
+    // Validate converted inputs
+    const validation = validateInputs(pressurePsi, temperatureCelsius);
     if (!validation.valid) {
         showError(validation.message);
         return;
     }
     
     try {
-        // Calculate gradient
-        const results = calculateGasGradient(pressure, temperature);
+        // Calculate gradient (in psi/ft)
+        const results = calculateGasGradient(pressurePsi, temperatureCelsius);
         
-        // Display results
-        displayResults(results, showDetails);
+        // Display results with unit conversion
+        displayResults(results, showDetails, outputUnit);
     } catch (error) {
         showError('An error occurred during calculation. Please check your inputs.');
         console.error('Calculation error:', error);
@@ -191,12 +259,15 @@ function handleFormSubmit(event) {
 
 /**
  * Load example values into the form
- * @param {number} pressure - Example pressure
- * @param {number} temperature - Example temperature
+ * @param {number} pressure - Example pressure (in psi)
+ * @param {number} temperature - Example temperature (in Celsius)
  */
 function loadExample(pressure, temperature) {
     document.getElementById('pressure').value = pressure;
     document.getElementById('temperature').value = temperature;
+    document.getElementById('pressureUnit').value = 'psi';
+    document.getElementById('temperatureUnit').value = 'C';
+    document.getElementById('outputUnit').value = 'psi/ft';
     document.getElementById('showDetails').checked = true;
     
     // Trigger calculation
